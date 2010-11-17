@@ -63,6 +63,8 @@ class Parser {
 			"ignore"	=>	'',
 			"internal"	=>	'',
 			"link"		=>	'',
+			"param"		=>	'',
+			"return"	=> 	'',
 			"see"		=>	'',
 			"since"		=>	'',
 			"tutorial"	=>	'',
