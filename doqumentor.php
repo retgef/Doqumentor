@@ -28,7 +28,8 @@ require('parser.php');
 * Displays all functions, constants and classes available at the point
 * of initialisation.  Options available allow the system to only show
 * user defined functions/constants/classes or to display all available.
-* Simple example usage: Doqument::init()->display();
+* Simple example usage: 
+* Doqument::init()->display();
 * 
 * @author Murray Picton
 * @copyright 2010 Murray Picton
@@ -64,6 +65,11 @@ class Doqument {
 	* Use jQuery when outputting
 	*/
 	private $jquery		= false;
+	
+	/**
+	* Hide the long filepath
+	*/
+	private $hidepath	= false;
 	
 	/**
 	* Initialise all variables and get all defined assets
@@ -203,15 +209,23 @@ class Doqument {
 		$html .= "<div class=\"$type\" title=\"" . strtolower($item->getShortName()) . "\">" . PHP_EOL;
 		$html .= "<h2>$type " . $item->getShortName();
 		
-		if(is_a($item, 'ReflectionFunction'))
+		if(is_a($item, 'ReflectionFunction') || is_a($item, 'ReflectionMethod'))
 			$html .= "(" . $this->formatParameters($item->getParameters()) . ")";
 			
 		$html .= "</h2>" . PHP_EOL;
-		if($comment = $this->getComment($item)) { //Get our parsed comment
-			$html .= "<p class=\"comment\">Comment:</p>";
-			$html .= "<pre class=\"comment\">" . $comment . "</pre>";
+		if($parser = $this->parseComment($item)) { //Get our parsed comment
+			$shortDesc = $parser->getShortDesc();
+			if(!empty($shortDesc)) {
+				$html .= "<pre class=\"comment\">" . $shortDesc . "</pre>";
+			}
+			$desc = $parser->getDesc();
+			if(!empty($desc)) {
+				$html .= "<p class=\"comment\">Description:</p>";
+				$html .= "<pre class=\"comment\">" . $desc . "</pre>";
+			}
+			$html .= $this->formatPHPDocParams($parser->getParams());
 		}
-		$filename = $item->getFileName();
+		$filename = $this->formatFilePath($item->getFileName());
 		if(!empty($filename)) {
 			$html .= "<p class=\"info\"><span class=\"filename\">" . $filename. ": </span><span class=\"lines\">Lines " . $item->getStartLine() . " - " . $item->getEndLine() . "</span></p>" . PHP_EOL;
 		}
@@ -230,18 +244,72 @@ class Doqument {
 	}
 	
 	/**
-	* Get the comment, parse it is a PHPDoc comment and return the
-	* comment.
+	* Parse the comment and return the parser object
 	*
 	* @param mixed $item ReflectionFunction or ReflectionClass object
-	* @return string Comment
+	* @return Parser Parser object
 	*/
-	protected function getComment($item) {
+	protected function parseComment($item) {
 		if(!$comment = $item->getDocComment()) return false;
 		
 		$parser = new Parser($comment);
 		$parser->parse();
-		return $parser->getDesc();
+		return $parser;
+	}
+	
+	/**
+	* Format the PHPDoc paramaters into HTML
+	* 
+	* @param array $params The parameters to get
+	* @return string HTML formatted parameters
+	*/
+	protected function formatPHPDocParams($params) {
+		$arr = array();
+		foreach($params as $param=>$value) {
+			if(empty($value)) continue;
+			if($param == 'param')
+				$arr = array_merge($arr, $this->formatParamArray($value));
+			else
+				$arr[] = "<li><em>$param:</em> " . htmlentities($value) . "</li>";
+		}
+		return '<ul>' . PHP_EOL . implode(PHP_EOL, $arr) . PHP_EOL . '</ul>';
+	}
+	
+	/**
+	* Format a PHPDoc paramaters
+	*
+	* Format a PHPDoc paramater or array of paramaters so it is easy
+	* to read.
+	*
+	* @param mixed $params Either a string or array containing the parameter(s)
+	* @return array Array of formatted parameters
+	*/
+	protected function formatParamArray($params) {
+		$arr = array();
+		
+		if(!is_array($params)) $params = array($params);
+		
+		foreach($params as $param) {
+			$pos = strpos($param, ' ');
+		
+			$paramName = substr($param, 0, $pos);
+			$arr[] = "<li><em>$paramName:</em> " . substr($param, $pos+1) . "</li>";
+		}
+		
+		return $arr;
+	}
+	
+	/**
+	* Format a filepath according to settings
+	*
+	* @param string $filepath The filepath to format
+	* @return string Formatted filepath
+	*/
+	protected function formatFilePath($filepath) {
+		if($this->hidefilepath)
+			return '.../' . basename($filepath);
+		else
+			return $filepath;
 	}
 	
 	/**
@@ -266,6 +334,16 @@ class Doqument {
 	*/
 	public function jquerify() {
 		$this->jquery = true;
+		return $this;
+	}
+	
+	/**
+	* Hide the filepath
+	*
+	* @return Doqument Doquement for stringing
+	*/
+	public function hidePath() {
+		$this->hidefilepath = true;
 		return $this;
 	}
 	

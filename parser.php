@@ -19,7 +19,9 @@ namespace Doqumentor;
 /**
 * PHPDoc parser for use in Doqumentor
 *
-* Simple example usage: $a = new Parser($string); $a->parse();
+* Simple example usage: 
+* $a = new Parser($string); 
+* $a->parse();
 * 
 * @author Murray Picton
 * @copyright 2010 Murray Picton
@@ -113,6 +115,21 @@ class Parser {
 		
 		$this->params = $params;
 	}
+	
+	/**
+	* Parse a parameter or string to display in simple typecast display
+	*
+	* @param string $string The string to parse
+	* @return string Formatted string wiht typecast
+	*/
+	private function formatParamOrReturn($string) {
+		
+		$pos = strpos($string, ' ');
+		
+		$type = substr($string, 0, $pos);
+		return '(' . $type . ')' . substr($string, $pos+1);
+	}
+	
 	/**
 	* Set a parameter
 	* 
@@ -122,6 +139,8 @@ class Parser {
 	*/
 	private function setParam($param, $value) {
 		if(!array_key_exists($param, $this->params)) return false;
+		
+		if($param == 'param' || $param == 'return') $value = $this->formatParamOrReturn($value);
 		
 		if(empty($this->params[$param])) {
 			$this->params[$param] = $value;
@@ -151,7 +170,7 @@ class Parser {
 		$comment = trim($comment[1]);
 		
 		//Get all the lines and strip the * from the first character
-		if(preg_match_all('#^\*(.*)#m', $comment, $lines) === false)
+		if(preg_match_all('#^\s*\*(.*)#m', $comment, $lines) === false)
 			die('Error');
 		
 		$this->parseLines($lines[1]);
