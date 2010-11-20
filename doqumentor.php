@@ -22,7 +22,6 @@ namespace Doqumentor;
 * read HTML.
 */
 require('parser.php');
-
 /**
 * Runtime documentor for PHP
 * 
