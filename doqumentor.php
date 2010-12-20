@@ -1,5 +1,5 @@
 <?php 
-namespace Doqumentor;
+//namespace Doqumentor;
 /**
 	This file is part of Doqumentor.
 
