@@ -72,6 +72,11 @@ class Doqument {
 	private $hidepath	= false;
 	
 	/**
+	* Path to doqument.png
+	*/
+	private $imagePath	= "doqument.png";
+	
+	/**
 	* Initialise all variables and get all defined assets
 	*
 	* Gets all declared functions, classes and constants available
@@ -338,6 +343,16 @@ class Doqument {
 	}
 	
 	/**
+	* Set image path for doqument.png
+	*
+	* @return Doqument Doquement for stringing
+	*/
+	public function setImagePath($path) {
+		$this->imagePath = $path;
+		return $this;
+	}
+	
+	/**
 	* Hide the filepath
 	*
 	* @return Doqument Doquement for stringing
@@ -420,7 +435,7 @@ class Doqument {
 	public function display() {
 		echo $this->get();
 		if($this->jquery) {
-			echo "<div style=\"position: absolute; bottom: 10px; right: 10px\"><a href=\"#\" onclick=\"$('#doqument').dialog('open'); return false;\">[Doqument]</a></div>";
+			echo "<div style=\"position: absolute; bottom: 10px; right: 10px\"><a href=\"#\" onclick=\"$('#doqument').dialog('open'); return false;\"><img src=\"" . $this->imagePath . "\" border=\"0\" /></a></div>";
 			echo $this->jquery();
 		}
 	}
