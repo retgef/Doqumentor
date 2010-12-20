@@ -120,7 +120,8 @@ class Doqument {
 		/**
 		* Sort all my arrays into alphabetical order
 		*/
-		asort($this->constants);
+		if(is_array($this->constants))
+			asort($this->constants);
 		usort($this->functions, array($this, 'sort'));
 		usort($this->classes, array($this, 'sort'));
 	}
@@ -137,7 +138,7 @@ class Doqument {
 	protected function parseFunctions($functions) {
 		$functionList = array();
 		foreach($functions as $func) {
-			$functionList[] = new \ReflectionFunction($func);
+			$functionList[] = new ReflectionFunction($func);
 		}
 		return $functionList;
 	}
@@ -154,7 +155,7 @@ class Doqument {
 	protected function parseClasses($classes) {
 		$classList = array();
 		foreach($classes as $class) {
-			$classList[] = new \ReflectionClass($class);
+			$classList[] = new ReflectionClass($class);
 		}
 		return $classList;
 	}
@@ -162,12 +163,12 @@ class Doqument {
 	/**
 	* Custom sort function that sorts according to short name
 	*
-	* @param mixed $item1 Reflection object with method getShortName
-	* @param mixed $item2 Reflection object with method getShortName
+	* @param mixed $item1 Reflection object with method getName
+	* @param mixed $item2 Reflection object with method getName
 	* @return int
 	*/
 	protected function sort($item1, $item2) {
-		return strcmp($item1->getShortName(), $item2->getShortName());
+		return strcmp($item1->getName(), $item2->getName());
 	}
 	
 	/**
@@ -211,8 +212,8 @@ class Doqument {
 	protected function formatItem($item, $type = 'unknown') {	
 		$html  = '';
 		
-		$html .= "<div class=\"$type\" title=\"" . strtolower($item->getShortName()) . "\">" . PHP_EOL;
-		$html .= "<h2>$type " . $item->getShortName();
+		$html .= "<div class=\"$type\" title=\"" . strtolower($item->getName()) . "\">" . PHP_EOL;
+		$html .= "<h2>$type " . $item->getName();
 		
 		if(is_a($item, 'ReflectionFunction') || is_a($item, 'ReflectionMethod'))
 			$html .= "(" . $this->formatParameters($item->getParameters()) . ")";
@@ -245,7 +246,7 @@ class Doqument {
 	* @return string jquery.js formatted between <script> tags
 	*/
 	protected function jquery() {
-		return "<script> " . file_get_contents('jquery.js', FILE_USE_INCLUDE_PATH) . "</script>";
+		//return "<script> " . file_get_contents('jquery.js', FILE_USE_INCLUDE_PATH) . "</script>";
 	}
 	
 	/**
@@ -435,7 +436,7 @@ class Doqument {
 	public function display() {
 		echo $this->get();
 		if($this->jquery) {
-			echo "<div style=\"position: absolute; bottom: 10px; right: 10px\"><a href=\"#\" onclick=\"$('#doqument').dialog('open'); return false;\"><img src=\"" . $this->imagePath . "\" border=\"0\" /></a></div>";
+			echo "<div style=\"position: fixed; bottom: 0px; right: 0px\"><a href=\"#\" onclick=\"$('#doqument').dialog('open'); return false;\"><img src=\"" . $this->imagePath . "\" border=\"0\" /></a></div>";
 			echo $this->jquery();
 		}
 	}

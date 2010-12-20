@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with Doqumentor.  If not, see <http://www.gnu.org/licenses/>.
 */
+$(function() {
 mydoc = $('#doqument');
 elements = mydoc.find('.constant, .function, .class, .method');
 elements.find('H2').addClass('ui-widget-header').addClass('ui-corner-all').css('padding-left', ' 0.5em').css('cursor', 'pointer');
@@ -38,6 +39,7 @@ mydoc.dialog({
 		width: dialogWidth,
 		height: dialogHeight,
 		title: 'Doqumentor'	
+});
 });
 
 function show(elm) {
