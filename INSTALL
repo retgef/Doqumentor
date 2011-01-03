@@ -1,0 +1,10 @@
+Quick Start
+
+1. Unzip the downloaded zip.
+2. Upload the files to your server in the appropriate locations.
+3. Include "doqumentor.php" on the page you wish to document.
+4. Place the following code to run Doqumentor:
+Doqument::init()->display();
+
+For more information check out the documentation at:
+http://www.doqumentor.com/documentation.php
